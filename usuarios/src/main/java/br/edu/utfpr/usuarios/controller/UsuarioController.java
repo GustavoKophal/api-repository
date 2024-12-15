@@ -2,6 +2,8 @@ package br.edu.utfpr.usuarios.controller;
 
 import br.edu.utfpr.usuarios.model.UsuarioModel;
 import br.edu.utfpr.usuarios.repository.UsuarioRepository;
+import io.swagger.v3.oas.annotations.Operation;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,10 @@ public class UsuarioController {
     private UsuarioRepository usuarioRepository;
 
     @GetMapping
+    @Operation(
+	summary = "listar todas as categorias", 
+	description = "Retorna todas as categorias listadas"
+    )
     public List<UsuarioModel> getAllUsuarios() {
         return usuarioRepository.findAll();
     }
