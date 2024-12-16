@@ -8,6 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -24,11 +28,27 @@ public class ConteudoController {
     private final String CATEGORY_SERVICE_URL = "http://localhost:8082/categorias";
 
     @GetMapping
+    @Operation(
+        summary = "Listar todos os conteúdos",
+        description = "Retorna uma lista com todos os conteúdos cadastrados no sistema."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Conteúdos encontrados"),
+        @ApiResponse(responseCode = "404", description = "Nenhum conteúdo encontrado")
+    })
     public List<ConteudoDTO> getAllConteudos() {
         return conteudoRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
+    @Operation(
+        summary = "Buscar conteúdo por ID",
+        description = "Retorna o conteúdo correspondente ao ID fornecido."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Conteúdo encontrado"),
+        @ApiResponse(responseCode = "404", description = "Conteúdo não encontrado")
+    })
     public ResponseEntity<ConteudoDTO> getConteudoById(@PathVariable Long id) {
         Optional<ConteudoModel> conteudo = conteudoRepository.findById(id);
         if (conteudo.isPresent()) {
@@ -39,6 +59,14 @@ public class ConteudoController {
     }
 
     @PostMapping
+    @Operation(
+        summary = "Criar novo conteúdo",
+        description = "Cria um novo conteúdo com as informações fornecidas."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Conteúdo criado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Requisição inválida")
+    })
 public ResponseEntity<ConteudoDTO> createConteudo(@RequestBody ConteudoDTO conteudoDTO) {
     RestTemplate restTemplate = new RestTemplate();
 
@@ -61,6 +89,14 @@ public ResponseEntity<ConteudoDTO> createConteudo(@RequestBody ConteudoDTO conte
 }
 
     @PutMapping("/{id}")
+    @Operation(
+        summary = "Atualizar conteúdo",
+        description = "Atualiza as informações do conteúdo com o ID fornecido."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Conteúdo atualizado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Conteúdo não encontrado")
+    })
     public ResponseEntity<ConteudoDTO> updateConteudo(@PathVariable Long id, @RequestBody ConteudoDTO conteudoDTO) {
         Optional<ConteudoModel> conteudoOptional = conteudoRepository.findById(id);
         if (conteudoOptional.isPresent()) {
@@ -82,6 +118,14 @@ public ResponseEntity<ConteudoDTO> createConteudo(@RequestBody ConteudoDTO conte
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+        summary = "Excluir conteúdo",
+        description = "Exclui o conteúdo correspondente ao ID fornecido."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Conteúdo excluído com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Conteúdo não encontrado")
+    })
     public ResponseEntity<Void> deleteConteudo(@PathVariable Long id) {
         if (conteudoRepository.existsById(id)) {
             conteudoRepository.deleteById(id);
