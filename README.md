@@ -1,5 +1,11 @@
 # Api-repository
 
+# Integrantes
+
+- Arnold Zago dos Reis: https://github.com/ArnoldReis
+- Gustavo Henrique Kophal: https://github.com/GustavoKophal
+- Mayne Cristine Fogassa da Silva: https://github.com/cafeyne
+
 # Visão Geral da Arquitetura
 
 Este projeto é uma aplicação baseada em microserviços que organiza e gerencia usuários, conteúdos, cursos e categorias. A arquitetura é composta por três microserviços principais que se comunicam via APIs RESTful. Um API Gateway centraliza o controle de acesso. 
