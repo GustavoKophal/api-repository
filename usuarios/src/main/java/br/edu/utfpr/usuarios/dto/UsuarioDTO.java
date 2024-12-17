@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class UsuarioDTO {
 
+    @NotBlank(message = "Email não pode ser vazio")
     @NotNull(message = "Email é obrigatório")
     @Email(message = "Email deve ser válido")
     private String email;

@@ -60,7 +60,6 @@ public class UsuarioController {
         @ApiResponse(responseCode = "400", description = "Requisição inválida")
 })
 public ResponseEntity<?> createUsuario(@Valid @RequestBody UsuarioDTO usuarioDTO, BindingResult bindingResult) {
-    // Verifica erros de validação
     if (bindingResult.hasErrors()) {
         HashMap<String, String> errors = new HashMap<>();
         for (FieldError error : bindingResult.getFieldErrors()) {
@@ -90,20 +89,27 @@ public ResponseEntity<?> createUsuario(@Valid @RequestBody UsuarioDTO usuarioDTO
             @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    public ResponseEntity<UsuarioModel> updateUsuario(@PathVariable Long id,
-            @Valid @RequestBody UsuarioModel usuarioDetails) {
+    public ResponseEntity<?> updateUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioDTO usuarioDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            HashMap<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
+        }
         Optional<UsuarioModel> usuarioOptional = usuarioRepository.findById(id);
-        if (usuarioOptional.isPresent()) {
-            UsuarioModel usuario = usuarioOptional.get();
-            usuario.setNome(usuarioDetails.getNome());
-            usuario.setEmail(usuarioDetails.getEmail());
-            usuario.setSenha(usuarioDetails.getSenha());
-            usuario.setCurso(usuarioDetails.getCurso());
-            UsuarioModel updatedUsuario = usuarioRepository.save(usuario);
-            return ResponseEntity.ok(updatedUsuario);
-        } else {
+        if (usuarioOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        UsuarioModel usuario = usuarioOptional.get();
+        usuario.setNome(usuarioDTO.getNome());
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setSenha(usuarioDTO.getSenha());
+        usuario.setCurso(usuarioDTO.getCurso());
+    
+        UsuarioModel updatedUsuario = usuarioRepository.save(usuario);
+    
+        return ResponseEntity.ok(updatedUsuario);
     }
 
     @DeleteMapping("/{id}")
