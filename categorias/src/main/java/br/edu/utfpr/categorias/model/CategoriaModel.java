@@ -2,12 +2,8 @@ package br.edu.utfpr.categorias.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "categorias")
 public class CategoriaModel {
@@ -18,7 +14,9 @@ public class CategoriaModel {
     @Column(nullable = false)
     private String disciplina;
 
+    @Column(nullable = false)
     private String descricao;
 
+    @Column(nullable = false)
     private String curso;
 }
