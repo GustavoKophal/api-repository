@@ -5,12 +5,14 @@ import br.edu.utfpr.conteudos.model.ConteudoModel;
 import br.edu.utfpr.conteudos.repository.ConteudoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -67,25 +69,35 @@ public class ConteudoController {
         @ApiResponse(responseCode = "201", description = "Conteúdo criado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Requisição inválida")
     })
-public ResponseEntity<ConteudoDTO> createConteudo(@RequestBody ConteudoDTO conteudoDTO) {
-    RestTemplate restTemplate = new RestTemplate();
+public ResponseEntity<?> createConteudo(@Valid @RequestBody ConteudoDTO conteudoDTO, BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+        // Captura erros de validação
+        var errors = bindingResult.getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        error -> error.getField(),
+                        error -> error.getDefaultMessage()
+                ));
+        return ResponseEntity.badRequest().body(errors);
+    }
 
+    // Verificar se o autor e a categoria existem
+    RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<Object> autorResponse = restTemplate.getForEntity(USER_SERVICE_URL + "/" + conteudoDTO.getAutorId(), Object.class);
     if (!autorResponse.getStatusCode().is2xxSuccessful()) {
-        return ResponseEntity.badRequest().body(null);
+        return ResponseEntity.badRequest().body("Autor inválido.");
     }
 
     ResponseEntity<Object> categoriaResponse = restTemplate.getForEntity(CATEGORY_SERVICE_URL + "/" + conteudoDTO.getCategoriaId(), Object.class);
     if (!categoriaResponse.getStatusCode().is2xxSuccessful()) {
-        return ResponseEntity.badRequest().body(null);
+        return ResponseEntity.badRequest().body("Categoria inválida.");
     }
 
-   
+    // Criação e salvamento do conteúdo
     ConteudoModel conteudoModel = convertToModel(conteudoDTO);
     conteudoModel.setDataCriacao(LocalDateTime.now());
     ConteudoModel savedConteudo = conteudoRepository.save(conteudoModel);
 
-    return ResponseEntity.ok(convertToDTO(savedConteudo));
+    return ResponseEntity.status(201).body(convertToDTO(savedConteudo));
 }
 
     @PutMapping("/{id}")

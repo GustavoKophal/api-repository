@@ -1,4 +1,4 @@
-package br.edu.utfpr.usuarios.exception;
+package br.edu.utfpr.conteudos.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
