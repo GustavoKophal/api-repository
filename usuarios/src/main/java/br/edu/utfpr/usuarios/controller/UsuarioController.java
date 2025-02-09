@@ -7,10 +7,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import br.edu.utfpr.usuarios.config.SecurityConfig;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +28,12 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public UsuarioController(BCryptPasswordEncoder bCryptPasswordEncoder){
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @GetMapping
     @Operation(summary = "Listar todos os usuários", description = "Retorna uma lista com todos os usuários cadastrados no sistema.")
@@ -72,7 +80,7 @@ public ResponseEntity<?> createUsuario(@Valid @RequestBody UsuarioDTO usuarioDTO
     UsuarioModel usuario = new UsuarioModel();
     usuario.setEmail(usuarioDTO.getEmail());
     usuario.setNome(usuarioDTO.getNome());
-    usuario.setSenha(usuarioDTO.getSenha());
+    usuario.setSenha(bCryptPasswordEncoder.encode(usuarioDTO.getSenha()));
     usuario.setCurso(usuarioDTO.getCurso());
 
     // Salvando o usuário no banco
@@ -104,7 +112,7 @@ public ResponseEntity<?> createUsuario(@Valid @RequestBody UsuarioDTO usuarioDTO
         UsuarioModel usuario = usuarioOptional.get();
         usuario.setNome(usuarioDTO.getNome());
         usuario.setEmail(usuarioDTO.getEmail());
-        usuario.setSenha(usuarioDTO.getSenha());
+        usuario.setSenha(bCryptPasswordEncoder.encode(usuarioDTO.getSenha()));
         usuario.setCurso(usuarioDTO.getCurso());
     
         UsuarioModel updatedUsuario = usuarioRepository.save(usuario);
